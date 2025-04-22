@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-
+// const { MongoClient } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -28,12 +28,32 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
 
-        const userCollection = client.db("mansDB").collection("allusers")
+        const userCollection = client.db("mansDB").collection("allusers");
+        const newspostCollection = client.db("mansDB").collection("newspost");
+
         // Connect the client to the server	(optional starting in v4.7)
         // await client.connect();
         // Send a ping to confirm a successful connection
         // await client.db("admin").command({ ping: 1 });
 
+        
+        // news post create
+        app.post('/newspost', async (req, res) => {
+            const news = req.body;
+            const result = await newspostCollection.insertOne(news);
+            res.send(result);
+        })
+        // news post api 
+        app.get('/newspost', async (req, res) => {
+            try {
+              const cursor = newspostCollection.find();
+              const result = await cursor.toArray();
+              res.status(200).json(result);
+            } catch (err) {
+              console.error('Error in GET /newspost:', err);
+              res.status(500).json({ error: err.message || 'Server error' });
+            }
+          });
 
         // user api read
         app.get('/user', async (req, res) => {
