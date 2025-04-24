@@ -13,7 +13,7 @@ app.use(express.json());
 
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://mans:${process.env.DB_PASS}@cluster0.toqnk.mongodb.net/?appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -36,7 +36,9 @@ async function run() {
         // Send a ping to confirm a successful connection
         // await client.db("admin").command({ ping: 1 });
 
-        
+
+
+
         // news post create
         app.post('/newspost', async (req, res) => {
             const news = req.body;
@@ -46,15 +48,22 @@ async function run() {
         // news post api 
         app.get('/newspost', async (req, res) => {
             try {
-              const cursor = newspostCollection.find();
-              const result = await cursor.toArray();
-              res.status(200).json(result);
+                const cursor = newspostCollection.find();
+                const result = await cursor.toArray();
+                res.status(200).json(result);
             } catch (err) {
-              console.error('Error in GET /newspost:', err);
-              res.status(500).json({ error: err.message || 'Server error' });
+                console.error('Error in GET /newspost:', err);
+                res.status(500).json({ error: err.message || 'Server error' });
             }
-          });
-
+        });
+        //  user delete api
+        app.delete('/user/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await userCollection.deleteOne(query);
+            res.send(result);
+        })
+        
         // user api read
         app.get('/user', async (req, res) => {
             const cursor = userCollection.find();
