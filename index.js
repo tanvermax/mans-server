@@ -172,6 +172,9 @@ async function run() {
 
         // Users API create
         app.post('/user', async (req, res) => {
+            if (!user.email) {
+                return res.status(400).send({ message: 'Invalid user data', insertedId: null });
+            }
             try {
                 const user = req.body;
                 const query = { email: user.email };
