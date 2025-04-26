@@ -171,7 +171,7 @@ async function run() {
           });
 
         // Users API create
-        app.post('/user', verifytoken, async (req, res) => {
+        app.post('/user', async (req, res) => {
             try {
                 const user = req.body;
                 const query = { email: user.email };
