@@ -41,6 +41,8 @@ async function run() {
                 next();
             })
         }
+
+
         const verifyAdmin = async (req, res, next) => {
             const email = req.decoded.email;  // Extract email from decoded token
             const query = { email: email };
@@ -111,6 +113,30 @@ async function run() {
             }
         });
 
+        app.delete('/newspost/:id', verifytoken, async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            try {
+                const result = await newspostCollection.deleteOne(query);
+                if (result.deletedCount > 0) {
+                    res.send({ success: true, message: "User deleted" });
+                } else {
+                    res.status(404).send({ success: false, message: "User not found" });
+                }
+            } catch (error) {
+                console.error("Error deleting user:", error);
+                res.status(500).send({ success: false, message: "Internal server error" });
+            }
+        });
+
+
+        app.get('/user/admin/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = await userCollection.findOne({ email: email });
+            const result = user?.role === 'admin';
+            res.send({ admin: result });
+        });
+        
         // For admin API
         app.patch('/user/admin/:id', verifytoken, async (req, res) => {
             const id = req.params.id;
