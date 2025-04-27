@@ -91,6 +91,19 @@ async function run() {
             }
         });
 
+        app.post('/newspost', async (req, res) => {
+           
+            try {
+                const user = req.body;
+               
+                const result = await newspostCollection.insertOne(user);
+                res.send(result);
+            } catch (error) {
+                console.error("Error inserting user:", error);
+                res.status(500).send({ message: "Failed to insert user" });
+            }
+        });
+
         // for make user 
         app.patch('/user/user/:id', verifytoken, async (req, res) => {
             const id = req.params.id;
