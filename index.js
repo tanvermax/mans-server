@@ -126,42 +126,45 @@ async function run() {
             }
         });
 
-        // app.patch(`/update/:id`,(req,res)=>{
-        //     try {
-        //         const id = req.params.id;
-        //         const updates = req.body;
+        // app.put('/updatetask/:id', async (req, res) => {
+        //     const id = req.params;
 
-        //         // Validate ID and updates
-        //         if (!id) {
-        //             return res.status(400).json({ error: 'ID is required' });
+        //     const updatedData = req.body;
+
+
+        //     const query = { _id: new ObjectId(id) }
+
+
+        //     const data = {
+        //         $set: {
+        //             title: updatedData.title,
+        //             description: updatedData.description,
+        //             date: updatedData.date,
+        //             priority: updatedData.priority,
+        //             status: updatedData.status,
         //         }
-
-        //         if (!updates || Object.keys(updates).length === 0) {
-        //             return res.status(400).json({ error: 'No updates provided' });
-        //         }
-
-        //         // Here you would typically update the record in your database
-        //         // For example, with MongoDB:
-        //         // const result = await db.collection('items').updateOne(
-        //         //     { _id: new ObjectId(id) },
-        //         //     { $set: updates }
-        //         // );
-
-        //         // Mock response for demonstration
-        //         console.log(`Updating item ${id} with:`, updates);
-
-        //         res.status(200).json({
-        //             message: 'Item updated successfully',
-        //             id: id,
-        //             updates: updates
-        //             // If using a database, you might include:
-        //             // modifiedCount: result.modifiedCount
-        //         });
-        //     } catch (error) {
-        //         console.error('Error updating item:', error);
-        //         res.status(500).json({ error: 'Internal server error' });
         //     }
+
+        //     const service = await taskCollection.updateOne(query, data);
+        //     res.send(service)
         // })
+
+        app.put('/banner/:id', async (req, res) => {
+            const id = req.params;
+            const updatedData = req.body;
+
+            const query = { _id: new ObjectId(id) };
+
+            const data = {
+                $set: {
+                    image: updatedData.image,
+                    heading: updatedData.heading,
+                    description: updatedData.description
+                }
+            }
+            const banner = await bannerCollection.updateOne(query,data);
+            res.send(banner);
+        })
 
         app.get('/banner/:id', async (req, res) => {
             try {
