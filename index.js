@@ -25,7 +25,7 @@ async function run() {
     try {
         const userCollection = client.db("mansDB").collection("allusers");
         const newspostCollection = client.db("mansDB").collection("newspost");
-
+        const bannerCollection = client.db("mansDB").collection("banner")
 
         const verifytoken = (req, res, next) => {
             // console.log("inside verytoken", req.headers.authorization);
@@ -46,38 +46,38 @@ async function run() {
         const verifyAdmin = async (req, res, next) => {
             const email = req.decoded.email;  // Extract email from decoded token
             const query = { email: email };
-      
+
             // Fetch user from databasenot
             const user = await userCollection.findOne(query);
-      
+
             if (!user) {
-              return res.status(404).send({ message: 'User not found' });
+                return res.status(404).send({ message: 'User not found' });
             }
-      
+
             // Check if user has admin role
             const isAdmin = user.role === 'admin';
             if (!isAdmin) {
-              return res.status(403).send({ message: 'Forbidden access: You are not an admin' });
+                return res.status(403).send({ message: 'Forbidden access: You are not an admin' });
             }
-      
+
             next();
-          };
+        };
 
         // veryfy token
         app.post('/jwt', (req, res) => {
             try {
-              const user = req.body;
-              console.log(user);
-              
-              const token = jwt.sign(user, process.env.JWT_ACCES_TOKEN, { expiresIn: '5h' });
-              res.cookie('access-token', token);
-              res.json({ message: 'token generated successfully', token });
+                const user = req.body;
+                console.log(user);
+
+                const token = jwt.sign(user, process.env.JWT_ACCES_TOKEN, { expiresIn: '5h' });
+                res.cookie('access-token', token);
+                res.json({ message: 'token generated successfully', token });
             } catch (error) {
-              console.error('error generated JWT:', error);
-              res.status(500).json({ error: 'Internal server Error' });
+                console.error('error generated JWT:', error);
+                res.status(500).json({ error: 'Internal server Error' });
             }
-          });
-          
+        });
+
 
         // News post API
         app.get('/newspost', async (req, res) => {
@@ -92,10 +92,10 @@ async function run() {
         });
 
         app.post('/newspost', async (req, res) => {
-           
+
             try {
                 const user = req.body;
-               
+
                 const result = await newspostCollection.insertOne(user);
                 res.send(result);
             } catch (error) {
@@ -126,6 +126,90 @@ async function run() {
             }
         });
 
+        // app.patch(`/update/:id`,(req,res)=>{
+        //     try {
+        //         const id = req.params.id;
+        //         const updates = req.body;
+
+        //         // Validate ID and updates
+        //         if (!id) {
+        //             return res.status(400).json({ error: 'ID is required' });
+        //         }
+
+        //         if (!updates || Object.keys(updates).length === 0) {
+        //             return res.status(400).json({ error: 'No updates provided' });
+        //         }
+
+        //         // Here you would typically update the record in your database
+        //         // For example, with MongoDB:
+        //         // const result = await db.collection('items').updateOne(
+        //         //     { _id: new ObjectId(id) },
+        //         //     { $set: updates }
+        //         // );
+
+        //         // Mock response for demonstration
+        //         console.log(`Updating item ${id} with:`, updates);
+
+        //         res.status(200).json({
+        //             message: 'Item updated successfully',
+        //             id: id,
+        //             updates: updates
+        //             // If using a database, you might include:
+        //             // modifiedCount: result.modifiedCount
+        //         });
+        //     } catch (error) {
+        //         console.error('Error updating item:', error);
+        //         res.status(500).json({ error: 'Internal server error' });
+        //     }
+        // })
+
+        app.get('/banner/:id', async (req, res) => {
+            try {
+                const id = req.params.id;
+                const banner = { _id: new ObjectId(id) };
+                const task = await bannerCollection.findOne(banner)
+                res.status(200).json(task);
+            }
+            catch (error) {
+                if (error instanceof mongoose.Error.CastError) {
+                    return res.status(400).json({ message: 'Invalid ID format' });
+                }
+                res.status(500).json({ message: 'Server error', error: error.message });
+            }
+        });
+
+
+        app.post('/banner', async (req, res) => {
+            try {
+                const banner = req.body;
+
+                const result = await bannerCollection.insertOne(banner);
+                res.send(result);
+            } catch (error) {
+                console.error("Error inserting banner data:", error);
+                res.status(500).send({ message: "Failed to banner data" });
+            }
+        });
+
+
+
+
+
+        // banner api get
+        app.get("/banner", async (req, res) => {
+            try {
+                const body = bannerCollection.find();
+                const result = await body.toArray();
+                res.status(200).json(result);
+            }
+            catch {
+                console.error('Error in GET /newspost:', err);
+                res.status(500).json({ error: err.message || 'Server error' });
+            }
+        });
+
+
+
         app.delete('/newspost/:id', verifytoken, async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
@@ -149,7 +233,7 @@ async function run() {
             const result = user?.role === 'admin';
             res.send({ admin: result });
         });
-        
+
         // For admin API
         app.patch('/user/admin/:id', verifytoken, async (req, res) => {
             const id = req.params.id;
@@ -171,7 +255,7 @@ async function run() {
                 res.status(500).send({ success: false, message: "Internal server error" });
             }
         });
-        
+
 
         // User delete API
         app.delete('/user/:id', verifytoken, async (req, res) => {
@@ -195,23 +279,23 @@ async function run() {
             const email = req.query.email;
             // If email is provided, find the specific user by email
             if (email) {
-              const user = await userCollection.findOne({ email: email });
-              if (user) {
-                res.send(user); // Send back the user data
-              } else {
-                res.status(404).send({ message: 'User not found' }); // Handle case where user is not found
-              }
+                const user = await userCollection.findOne({ email: email });
+                if (user) {
+                    res.send(user); // Send back the user data
+                } else {
+                    res.status(404).send({ message: 'User not found' }); // Handle case where user is not found
+                }
             } else {
-              // If no email is provided, return all users
-              const cursor = userCollection.find();
-              const result = await cursor.toArray();
-              res.send(result);
+                // If no email is provided, return all users
+                const cursor = userCollection.find();
+                const result = await cursor.toArray();
+                res.send(result);
             }
-          });
+        });
 
         // Users API create
         app.post('/user', async (req, res) => {
-           
+
             try {
                 const user = req.body;
                 const query = { email: user.email };
