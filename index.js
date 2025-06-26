@@ -126,28 +126,22 @@ async function run() {
             }
         });
 
-        // app.put('/updatetask/:id', async (req, res) => {
-        //     const id = req.params;
-
-        //     const updatedData = req.body;
-
-
-        //     const query = { _id: new ObjectId(id) }
-
-
-        //     const data = {
-        //         $set: {
-        //             title: updatedData.title,
-        //             description: updatedData.description,
-        //             date: updatedData.date,
-        //             priority: updatedData.priority,
-        //             status: updatedData.status,
-        //         }
-        //     }
-
-        //     const service = await taskCollection.updateOne(query, data);
-        //     res.send(service)
-        // })
+    //    banner edit
+    app.delete('/banner/:id', async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+        try {
+            const result = await bannerCollection.deleteOne(query);
+            if (result.deletedCount > 0) {
+                res.send({ success: true, message: "banner data deleted" });
+            } else {
+                res.status(404).send({ success: false, message: "banner data not found" });
+            }
+        } catch (error) {
+            console.error("Error deleting user:", error);
+            res.status(500).send({ success: false, message: "Internal server error" });
+        }
+    });
 
         app.put('/banner/:id', async (req, res) => {
             const id = req.params;
