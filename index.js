@@ -27,6 +27,7 @@ async function run() {
         const newspostCollection = client.db("mansDB").collection("newspost");
         const bannerCollection = client.db("mansDB").collection("banner")
         const portfolioCollection = client.db("mansDB").collection("portfolio")
+        const clientCollection = client.db("mansDB").collection("clinet")
 
         const verifytoken = (req, res, next) => {
             // console.log("inside verytoken", req.headers.authorization);
@@ -169,6 +170,32 @@ async function run() {
             } catch (error) {
                 console.error("Error inserting portfolio data:", error);
                 res.status(500).send({ message: "Failed to portfolio data" });
+            }
+        });
+           // clinet all data
+           app.get("/clinet", async (req, res) => {
+            try {
+                const body = clientCollection.find();
+                const result = await body.toArray();
+                res.status(200).json(result);
+            }
+            catch {
+                console.error('Error in GET /clinet:', err);
+                res.status(500).json({ error: err.message || 'Server error' });
+            }
+        });
+
+
+        // clinet add
+        app.post('/client', async (req, res) => {
+            try {
+                const client = req.body;
+
+                const result = await clientCollection.insertOne(client);
+                res.send(result);
+            } catch (error) {
+                console.error("Error inserting client data:", error);
+                res.status(500).send({ message: "Failed to client data" });
             }
         });
 
