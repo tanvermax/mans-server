@@ -26,6 +26,7 @@ async function run() {
         const userCollection = client.db("mansDB").collection("allusers");
         const newspostCollection = client.db("mansDB").collection("newspost");
         const bannerCollection = client.db("mansDB").collection("banner")
+        const portfolioCollection = client.db("mansDB").collection("portfolio")
 
         const verifytoken = (req, res, next) => {
             // console.log("inside verytoken", req.headers.authorization);
@@ -126,22 +127,37 @@ async function run() {
             }
         });
 
-    //    banner edit
-    app.delete('/banner/:id', async (req, res) => {
-        const id = req.params.id;
-        const query = { _id: new ObjectId(id) };
-        try {
-            const result = await bannerCollection.deleteOne(query);
-            if (result.deletedCount > 0) {
-                res.send({ success: true, message: "banner data deleted" });
-            } else {
-                res.status(404).send({ success: false, message: "banner data not found" });
+
+        // portfolio add
+        app.post('/portfolio', async (req, res) => {
+            try {
+                const portfolio = req.body;
+
+                const result = await portfolioCollection.insertOne(portfolio);
+                res.send(result);
+            } catch (error) {
+                console.error("Error inserting portfolio data:", error);
+                res.status(500).send({ message: "Failed to portfolio data" });
             }
-        } catch (error) {
-            console.error("Error deleting user:", error);
-            res.status(500).send({ success: false, message: "Internal server error" });
-        }
-    });
+        });
+
+
+        //    banner edit
+        app.delete('/banner/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            try {
+                const result = await bannerCollection.deleteOne(query);
+                if (result.deletedCount > 0) {
+                    res.send({ success: true, message: "banner data deleted" });
+                } else {
+                    res.status(404).send({ success: false, message: "banner data not found" });
+                }
+            } catch (error) {
+                console.error("Error deleting user:", error);
+                res.status(500).send({ success: false, message: "Internal server error" });
+            }
+        });
 
         app.put('/banner/:id', async (req, res) => {
             const id = req.params;
@@ -156,7 +172,7 @@ async function run() {
                     description: updatedData.description
                 }
             }
-            const banner = await bannerCollection.updateOne(query,data);
+            const banner = await bannerCollection.updateOne(query, data);
             res.send(banner);
         })
 
