@@ -148,7 +148,7 @@ async function run() {
 
 
         // portfolio all data
-         app.get("/portfolio", async (req, res) => {
+        app.get("/portfolio", async (req, res) => {
             try {
                 const body = portfolioCollection.find();
                 const result = await body.toArray();
@@ -172,8 +172,25 @@ async function run() {
                 res.status(500).send({ message: "Failed to portfolio data" });
             }
         });
-           // clinet all data
-           app.get("/clinet", async (req, res) => {
+
+        // deletet client data
+        app.delete('/clinet/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            try {
+                const result = await clientCollection.deleteOne(query);
+                if (result.deletedCount > 0) {
+                    res.send({ success: true, message: "clinet deleted" });
+                } else {
+                    res.status(404).send({ success: false, message: "clinet not found" });
+                }
+            } catch (error) {
+                console.error("Error deleting clinet:", error);
+                res.status(500).send({ success: false, message: "Internal server error" });
+            }
+        });
+        // clinet all data
+        app.get("/clinet", async (req, res) => {
             try {
                 const body = clientCollection.find();
                 const result = await body.toArray();
