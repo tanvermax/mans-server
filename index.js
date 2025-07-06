@@ -174,11 +174,12 @@ async function run() {
         });
 
         // deletet client data
-        app.delete('/clinet/:id', async (req, res) => {
+        app.delete('/client/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
             try {
                 const result = await clientCollection.deleteOne(query);
+
                 if (result.deletedCount > 0) {
                     res.send({ success: true, message: "clinet deleted" });
                 } else {
@@ -190,7 +191,7 @@ async function run() {
             }
         });
         // clinet all data
-        app.get("/clinet", async (req, res) => {
+        app.get("/client", async (req, res) => {
             try {
                 const body = clientCollection.find();
                 const result = await body.toArray();
@@ -278,10 +279,6 @@ async function run() {
                 res.status(500).send({ message: "Failed to banner data" });
             }
         });
-
-
-
-
 
         // banner api get
         app.get("/banner", async (req, res) => {
