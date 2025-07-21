@@ -28,6 +28,7 @@ async function run() {
         const bannerCollection = client.db("mansDB").collection("banner")
         const portfolioCollection = client.db("mansDB").collection("portfolio")
         const clientCollection = client.db("mansDB").collection("clinet")
+        const serviceCollection = client.db("mansDB").collection("service")
 
         const verifytoken = (req, res, next) => {
             // console.log("inside verytoken", req.headers.authorization);
@@ -80,6 +81,29 @@ async function run() {
             }
         });
 
+
+        // service
+        app.post('/service', async (req, res) => {
+            try {
+                const service = req.body;
+
+                const result = await serviceCollection.insertOne(service);
+                res.send(result);
+            } catch (error) {
+                console.error("Error inserting service data:", error);
+                res.status(500).send({ message: "Failed to service data" });
+            }
+        });
+        app.get('/service', async (req, res) => {
+            try {
+                const cursor = serviceCollection.find();
+                const result = await cursor.toArray();
+                res.status(200).json(result);
+            } catch (err) {
+                console.error('Error in GET /service:', err);
+                res.status(500).json({ error: err.message || 'Server error' });
+            }
+        });
 
         // News post API
         app.get('/newspost', async (req, res) => {
