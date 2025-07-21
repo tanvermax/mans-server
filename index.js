@@ -104,6 +104,21 @@ async function run() {
                 res.status(500).json({ error: err.message || 'Server error' });
             }
         });
+        app.delete('/service/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            try {
+                const result = await serviceCollection.deleteOne(query);
+                if (result.deletedCount > 0) {
+                    res.send({ success: true, message: "service deleted" });
+                } else {
+                    res.status(404).send({ success: false, message: "service not found" });
+                }
+            } catch (error) {
+                console.error("Error deleting user:", error);
+                res.status(500).send({ success: false, message: "Internal server error" });
+            }
+        });
 
         // News post API
         app.get('/newspost', async (req, res) => {
