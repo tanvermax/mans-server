@@ -146,7 +146,7 @@ async function run() {
         });
 
         // for make user 
-        app.patch('/user/user/:id', verifytoken, async (req, res) => {
+        app.patch('/user/user/:id', async (req, res) => {
             const id = req.params.id;
             console.log("Received PATCH request for user ID:", id);
             const filter = { _id: new ObjectId(id) };
@@ -334,7 +334,7 @@ async function run() {
 
 
 
-        app.delete('/newspost/:id', verifytoken, async (req, res) => {
+        app.delete('/newspost/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
             try {
@@ -359,7 +359,7 @@ async function run() {
         });
 
         // For admin API
-        app.patch('/user/admin/:id', verifytoken, async (req, res) => {
+        app.patch('/user/admin/:id', async (req, res) => {
             const id = req.params.id;
             console.log("Received PATCH request for user ID:", id);
             const filter = { _id: new ObjectId(id) };
@@ -381,8 +381,9 @@ async function run() {
         });
 
 
+
         // User delete API
-        app.delete('/user/:id', verifytoken, async (req, res) => {
+        app.delete('/user/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
             try {
@@ -401,6 +402,7 @@ async function run() {
         // User API read
         app.get('/user', async (req, res) => {
             const email = req.query.email;
+            console.log(email)
             // If email is provided, find the specific user by email
             if (email) {
                 const user = await userCollection.findOne({ email: email });
