@@ -241,7 +241,21 @@ async function run() {
                 res.status(500).json({ error: err.message || 'Server error' });
             }
         });
+        app.get('/newspost/:slug', async (req, res) => {
+            try {
+                const slug = req.params.slug;
+                const result = await newspostCollection.findOne({ slug: slug });
 
+                if (result) {
+                    res.status(200).json(result);
+                } else {
+                    res.status(404).json({ message: 'News article not found' });
+                }
+            } catch (err) {
+                console.error('Error in GET /newspost/:slug:', err);
+                res.status(500).json({ error: 'Server error' });
+            }
+        });
 
         // clinet add
         app.post('/client', async (req, res) => {
