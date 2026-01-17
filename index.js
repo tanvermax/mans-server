@@ -131,18 +131,35 @@ async function run() {
                 res.status(500).json({ error: err.message || 'Server error' });
             }
         });
+        const createSlug = (text) => {
+            return text
+                .toString()
+                .toLowerCase()
+                .trim()
+                .replace(/\s+/g, '-')     // Replace spaces with -
+                .replace(/[^\w-]+/g, '')  // Remove all non-word chars
+                .replace(/--+/g, '-');    // Replace multiple - with single -
+        };
 
         app.post('/newspost', async (req, res) => {
 
             try {
-                const user = req.body;
+        const postData = req.body;
 
-                const result = await newspostCollection.insertOne(user);
-                res.send(result);
-            } catch (error) {
-                console.error("Error inserting user:", error);
-                res.status(500).send({ message: "Failed to insert user" });
-            }
+        // Automatically generate the slug from the headline/title
+        if (postData.headline) {
+            postData.slug = createSlug(postData.headline);
+        }
+
+        // Add a timestamp (useful for the "publishedTime" metadata we discussed)
+        postData.createdAt = new Date();
+
+        const result = await newspostCollection.insertOne(postData);
+        res.send(result);
+    } catch (error) {
+        console.error("Error inserting post:", error);
+        res.status(500).send({ message: "Failed to insert post" });
+    }
         });
 
         // for make user 
