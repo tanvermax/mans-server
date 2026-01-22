@@ -123,7 +123,7 @@ async function run() {
         // News post API
         app.get('/newspost', async (req, res) => {
             try {
-                const cursor = newspostCollection.find();
+                const cursor = newspostCollection.find().sort({ createdAt: -1 });
                 const result = await cursor.toArray();
                 res.status(200).json(result);
             } catch (err) {
@@ -144,22 +144,22 @@ async function run() {
         app.post('/newspost', async (req, res) => {
 
             try {
-        const postData = req.body;
+                const postData = req.body;
 
-        // Automatically generate the slug from the headline/title
-        if (postData.headline) {
-            postData.slug = createSlug(postData.headline);
-        }
+                // Automatically generate the slug from the headline/title
+                if (postData.headline) {
+                    postData.slug = createSlug(postData.headline);
+                }
 
-        // Add a timestamp (useful for the "publishedTime" metadata we discussed)
-        postData.createdAt = new Date();
+                // Add a timestamp (useful for the "publishedTime" metadata we discussed)
+                postData.createdAt = new Date();
 
-        const result = await newspostCollection.insertOne(postData);
-        res.send(result);
-    } catch (error) {
-        console.error("Error inserting post:", error);
-        res.status(500).send({ message: "Failed to insert post" });
-    }
+                const result = await newspostCollection.insertOne(postData);
+                res.send(result);
+            } catch (error) {
+                console.error("Error inserting post:", error);
+                res.status(500).send({ message: "Failed to insert post" });
+            }
         });
 
         // for make user 
