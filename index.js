@@ -131,6 +131,32 @@ async function run() {
                 res.status(500).json({ error: err.message || 'Server error' });
             }
         });
+        app.patch('/newspost/:id', async (req, res) => {
+            try {
+                const id = req.params.id;
+                const filter = { _id: new ObjectId(id) };
+                const updatedDoc = {
+                    $set: {
+                        headline: req.body.headline,
+                        description: req.body.description,
+                        photoUrl: req.body.photoUrl,
+                        slug: req.body.slug,
+                        // We keep the original createdAt, but you could add an updatedAt here
+                    }
+                };
+
+                const result = await newspostCollection.updateOne(filter, updatedDoc);
+
+                if (result.modifiedCount > 0) {
+                    res.send({ success: true, message: 'Post updated successfully' });
+                } else {
+                    res.status(404).send({ success: false, message: 'No changes made or post not found' });
+                }
+            } catch (err) {
+                console.error('Error in PATCH /newspost:', err);
+                res.status(500).json({ error: 'Server error' });
+            }
+        });
         const createSlug = (text) => {
             return text
                 .toString()
