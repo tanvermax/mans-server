@@ -243,15 +243,33 @@ async function run() {
         });
 
         // portfolio add
-        app.post('/portfolio', async (req, res) => {
+        app.post('/newspost', async (req, res) => {
             try {
-                const portfolio = req.body;
+                const news = req.body;
 
-                const result = await portfolioCollection.insertOne(portfolio);
+                // --- SLUG GENERATOR LOGIC ---
+                // 1. Convert to lowercase
+                // 2. Remove special characters
+                // 3. Replace spaces with hyphens
+                const slug = news.headline
+                    .toLowerCase()
+                    .trim()
+                    .replace(/[^\w\s-]/g, '')     // Remove non-word chars (except spaces/hyphens)
+                    .replace(/[\s_-]+/g, '-')     // Replace spaces/underscores with a single hyphen
+                    .replace(/^-+|-+$/g, '');     // Trim hyphens from ends
+
+                // Add slug and timestamp to the object
+                const finalNews = {
+                    ...news,
+                    slug: slug,
+                    createdAt: new Date()
+                };
+
+                const result = await newspostCollection.insertOne(finalNews);
                 res.send(result);
             } catch (error) {
-                console.error("Error inserting portfolio data:", error);
-                res.status(500).send({ message: "Failed to portfolio data" });
+                console.error("Error inserting news data:", error);
+                res.status(500).send({ message: "Failed to upload news" });
             }
         });
 
