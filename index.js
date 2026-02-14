@@ -65,7 +65,6 @@ async function run() {
 
             next();
         };
-
         // veryfy token
         app.post('/jwt', (req, res) => {
             try {
@@ -80,8 +79,6 @@ async function run() {
                 res.status(500).json({ error: 'Internal server Error' });
             }
         });
-
-
         // service
         app.post('/service', async (req, res) => {
             try {
@@ -119,7 +116,6 @@ async function run() {
                 res.status(500).send({ success: false, message: "Internal server error" });
             }
         });
-
         // News post API
         app.get('/newspost', async (req, res) => {
             try {
@@ -167,6 +163,7 @@ async function run() {
                 .replace(/--+/g, '-');    // Replace multiple - with single -
         };
 
+
         app.post('/newspost', async (req, res) => {
 
             try {
@@ -188,6 +185,7 @@ async function run() {
             }
         });
 
+        
         // for make user 
         app.patch('/user/user/:id', async (req, res) => {
             const id = req.params.id;
@@ -210,8 +208,6 @@ async function run() {
             }
         });
         // deletet potfolio
-
-
         app.delete('/portfolio/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
@@ -228,7 +224,6 @@ async function run() {
             }
         });
 
-
         // portfolio all data
         app.get("/portfolio", async (req, res) => {
             try {
@@ -243,6 +238,18 @@ async function run() {
         });
 
         // portfolio add
+
+        app.post('/portfolio', async (req, res) => {
+            try {
+                const client = req.body;
+
+                const result = await portfolioCollection.insertOne(client);
+                res.send(result);
+            } catch (error) {
+                console.error("Error inserting client data:", error);
+                res.status(500).send({ message: "Failed to client data" });
+            }
+        });
         app.post('/newspost', async (req, res) => {
             try {
                 const news = req.body;
